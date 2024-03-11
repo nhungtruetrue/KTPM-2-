@@ -1,0 +1,13 @@
+ID Hóa ??n: HD1
+Lo?i giao d?ch: 1
+ID S?n ph?m: MPM001
+ID Mã gi?m giá: BEAUTY10
+S? l??ng: 2
+Th?i gian: 2024-03-08 22:06:57
+
+ID Hóa ??n: HD1
+ID S?n ph?m: MPM001
+ID Mã gi?m giá: 
+S? l??ng: 30
+Th?i gian: 2024-03-10 10:48:30
+

@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -88,57 +88,85 @@ void InvoiceManager::createPurchase() {
 
 void InvoiceManager::createInvoice() {
     std::string id = generateInvoiceId();
-    std::string productId;
     std::string discountCodeId;
-    int quantity;
+    int itemCount;
 
-    std::cout << "Nhap ID san pham : ";
-    std::cin >> productId;
+    std::cout << "Nhap so luong mat hang: ";
+    std::cin >> itemCount;
 
-    std::cout << "Nhap ma giam gia ( neu co): ";
-    std::cin >> discountCodeId;
-
-    std::cout << "Nhap so luong: ";
-    std::cin >> quantity;
-
-    // Kiểm tra sự tồn tại của sản phẩm và mã giảm giá
-    if (!isIdExist(productId)) {
-        std::cout << "San pham khong ton tai.\n";
+    if (itemCount <= 0) {
+        std::cout << "So luong mat hang khong hop le.\n";
         return;
     }
 
-    if (!isDiscountCodeExist(discountCodeId)) {
-        std::cout << "Ma giam gia khong ton tai.\n";
-        return;
+    double totalAmount = 0.0;
+
+    for (int i = 0; i < itemCount; ++i) {
+        std::string productId;
+        int quantity;
+
+        std::cout << "Nhap ID san pham thu " << i + 1 << ": ";
+        std::cin >> productId;
+
+        std::cout << "Nhap so luong: ";
+        std::cin >> quantity;
+
+        // Kiểm tra sự tồn tại của sản phẩm và đủ số lượng để bán
+        if (!isIdExist(productId)) {
+            std::cout << "San pham khong ton tai.\n";
+            return;
+        }
+
+        auto productIt = std::find_if(products.begin(), products.end(), [productId](const Product& p) {
+            return p.id == productId;
+            });
+
+        if (productIt != products.end() && productIt->quantity >= quantity) {
+            totalAmount += calculateTotalAmount(productId, quantity);
+
+            // Cập nhật số lượng sản phẩm
+            productIt->quantity -= quantity;
+        }
+        else {
+            std::cout << "Sản phẩm hoặc số lượng không hợp lệ.\n";
+            return;
+        }
     }
 
-    auto productIt = std::find_if(products.begin(), products.end(), [productId](const Product& p) {
-        return p.id == productId;
-        });
+    // Hỏi xem khách hàng có mã giảm giá không
+    char hasDiscountCode;
+    std::cout << "Khach hang co ma giam gia khong? (y/n): ";
+    std::cin >> hasDiscountCode;
 
-    // Kiểm tra đủ số lượng để bán
-    if (productIt != products.end() && productIt->quantity >= quantity) {
-        double totalAmount = calculateTotalAmount(productId, quantity);
-        double discountAmount = calculateDiscountAmount(discountCodeId, totalAmount);
-        double finalAmount = totalAmount - discountAmount;
+    if (hasDiscountCode == 'y' || hasDiscountCode == 'Y') {
+        // Nhập mã giảm giá
+        std::cout << "Nhap ma giam gia: ";
+        std::cin >> discountCodeId;
 
-        // Hiển thị thông tin hóa đơn
-        Invoice newInvoice(id, productId, discountCodeId, quantity);
-        newInvoice.display();
-        std::cout << "Tong tien: " << totalAmount << "\nTong giam gia: " << discountAmount
-            << "\nTong tien thanh toan: " << finalAmount << "\n";
-
-        // Cập nhật số lượng sản phẩm
-        productIt->quantity -= quantity;
-
-        // Lưu hóa đơn vào danh sách và file
-        invoices.push_back(newInvoice);
-        saveInvoiceToFile(newInvoice);
-        ProductManager::saveDataToFile(); // Update product quantity in the file
+        // Kiểm tra sự tồn tại của mã giảm giá
+        if (!isDiscountCodeExist(discountCodeId)) {
+            std::cout << "Ma giam gia khong ton tai.\n";
+            return;
+        }
     }
-    else {
-        std::cout << "Sản phẩm hoặc số lượng không hợp lệ.\n";
-    }
+
+    // Kiểm tra nếu hóa đơn trên 500,000 thì giảm giá 5%
+    double discount = (totalAmount > 500000) ? 0.05 * totalAmount : 0.0;
+
+    // Hiển thị thông tin hóa đơn
+    Invoice newInvoice(id, "", discountCodeId, itemCount);
+    newInvoice.display();
+
+    std::cout << "Tong tien: " << totalAmount << "\n";
+    std::cout << "Giam gia: " << discount << "\n";
+
+    double finalAmount = totalAmount - discount;
+    std::cout << "Tong tien thanh toan: " << finalAmount << "\n";
+
+    // Lưu hóa đơn vào danh sách và file
+    invoices.push_back(newInvoice);
+    saveInvoiceToFile(newInvoice);
+    ProductManager::saveDataToFile(); // Update product quantity in the file
 }
 
 

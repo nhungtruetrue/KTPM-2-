@@ -1,4 +1,4 @@
-﻿#include <iostream>
+#include <iostream>
 #include <cstdlib>
 #include "products.h"
 #include "voucher.h"
@@ -154,7 +154,7 @@ int main() {
         else {
             int employeeChoice;
             do {
-                std::cout << "Menu khach hang vien:\n";
+                std::cout << "Menu khach hang n:\n";
                 std::cout << "1. Tra cuu san pham\n2. Mua hang\n0. Thoat\n";
                 std::cout << "Nhap lua chon cua ban: ";
                 std::cin >> employeeChoice;

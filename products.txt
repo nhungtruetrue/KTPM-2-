@@ -1,3 +1,12 @@
-3
-nhung
-30000 30
+MPM001
+Kem duong am ban ngay Laneige
+400000 68
+MPM002
+Sua rua mat sang da Missha
+150000 85
+MPM003
+Serum chong lao hoa SK-II
+500000 100
+MPM004
+Kem chong nang Innisfree
+100000 100

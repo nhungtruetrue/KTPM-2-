@@ -7,7 +7,7 @@
 
 int main() {
     UserManager userManager;
-    userManager.addUser(User("employee", "employeepass", false));
+    userManager.addUser(User("kh", "khpass", false));
     userManager.addUser(User("admin", "adminpass", true));
 
     ProductManager productManager;
@@ -154,7 +154,7 @@ int main() {
         else {
             int employeeChoice;
             do {
-                std::cout << "Menu khach hang n:\n";
+                std::cout << "Menu khach hang:\n";
                 std::cout << "1. Tra cuu san pham\n2. Mua hang\n0. Thoat\n";
                 std::cout << "Nhap lua chon cua ban: ";
                 std::cin >> employeeChoice;

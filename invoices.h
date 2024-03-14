@@ -100,6 +100,8 @@ void InvoiceManager::createInvoice() {
     }
 
     double totalAmount = 0.0;
+    double finalAmount;
+    double discount =0.0;
 
     for (int i = 0; i < itemCount; ++i) {
         std::string productId;
@@ -112,16 +114,11 @@ void InvoiceManager::createInvoice() {
         std::cin >> quantity;
 
         // Kiểm tra sự tồn tại của sản phẩm và đủ số lượng để bán
-        if (!isIdExist(productId)) {
-            std::cout << "San pham khong ton tai.\n";
-            return;
-        }
-
-        auto productIt = std::find_if(products.begin(), products.end(), [productId](const Product& p) {
-            return p.id == productId;
+        auto productIt = std::find_if(products.begin(), products.end(), [=](const Product& p) {
+            return p.id == productId && p.quantity >= quantity;
             });
 
-        if (productIt != products.end() && productIt->quantity >= quantity) {
+        if (productIt != products.end()) {
             totalAmount += calculateTotalAmount(productId, quantity);
 
             // Cập nhật số lượng sản phẩm
@@ -148,10 +145,22 @@ void InvoiceManager::createInvoice() {
             std::cout << "Ma giam gia khong ton tai.\n";
             return;
         }
+
+        // Lấy phần trăm giảm giá từ mã giảm giá
+        auto discountCodeIt = std::find_if(discountCodes.begin(), discountCodes.end(), [=](const DiscountCode& d) {
+            return d.id == discountCodeId;
+            });
+
+        if (discountCodeIt != discountCodes.end()) {
+           discount = totalAmount * discountCodeIt->percentage / 100.0;; // Áp dụng giảm giá
+        }
     }
 
     // Kiểm tra nếu hóa đơn trên 500,000 thì giảm giá 5%
-    double discount = (totalAmount > 500000) ? 0.05 * totalAmount : 0.0;
+
+    if (totalAmount > 500000) {
+        discount += 0.05 * totalAmount;
+    }
 
     // Hiển thị thông tin hóa đơn
     Invoice newInvoice(id, "", discountCodeId, itemCount);
@@ -160,7 +169,7 @@ void InvoiceManager::createInvoice() {
     std::cout << "Tong tien: " << totalAmount << "\n";
     std::cout << "Giam gia: " << discount << "\n";
 
-    double finalAmount = totalAmount - discount;
+    finalAmount = totalAmount - discount;
     std::cout << "Tong tien thanh toan: " << finalAmount << "\n";
 
     // Lưu hóa đơn vào danh sách và file
